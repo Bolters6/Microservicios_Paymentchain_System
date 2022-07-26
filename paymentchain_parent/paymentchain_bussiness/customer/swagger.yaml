@@ -1,0 +1,178 @@
+openapi: 3.0.0
+info:
+  title: paymentchain-customer microservice
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080/api
+    description: common path
+paths:
+  /customer/addcustomer:
+    post:
+      summary: Añadir un nuevo customer
+      operationId: addCustomer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CustomerDtoP"
+      responses:
+        201:
+          description: Customer creado
+          content:
+            application/json:
+              schema:
+                type: object
+  /customer/getcustomer/{id}:
+    get:
+      summary: Obtener Customer
+      operationId: getCustomer
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        200:
+          description: Customer obtenido
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CustomerDtoG"
+  /customer/putcustomer/{id}:
+    put:
+      summary: Actualizar Customer
+      operationId: putCustomer
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CustomerDtoP"
+      responses:
+        201:
+          description: Customer updated
+          content:
+            application/json:
+              schema:
+                type: object
+  /customer/deletecustomer/{id}:
+    delete:
+      summary: Borrar Customer
+      operationId: deleteCustomer
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        200:
+          description: Customer Borrado
+components:
+  schemas:
+    CustomerDtoP:
+      type: object
+      properties:
+        code:
+          type: string
+          nullable: false
+          minLength: 1
+        iban:
+          type: string
+          nullable: false
+          minLength: 1
+        accountBalance:
+          type: number
+          nullable: false
+          minimum: 50
+        name:
+          type: string
+          nullable: false
+          minLength: 1
+        surname:
+          type: string
+          nullable: false
+          minLength: 1
+        phone:
+          type: string
+          nullable: false
+          minLength: 1
+        address:
+          type: string
+          nullable: false
+          minLength: 1
+        products:
+          type: array
+          nullable: false
+          uniqueItems: true
+          minItems: 1
+          items:
+            $ref: "#/components/schemas/ProductDto"
+    CustomerDtoG:
+      type: object
+      readOnly: true
+      properties:
+        id:
+          type: number
+        code:
+          type: string
+          nullable: false
+          minLength: 1
+        iban:
+          type: string
+          nullable: false
+          minLength: 1
+        accountBalance:
+          type: number
+          nullable: false
+          minimum: 50
+        name:
+          type: string
+          nullable: false
+          minLength: 1
+        surname:
+          type: string
+          nullable: false
+          minLength: 1
+        phone:
+          type: string
+          nullable: false
+          minLength: 1
+        address:
+          type: string
+          nullable: false
+          minLength: 1
+        products:
+          type: array
+          nullable: false
+          uniqueItems: true
+          minItems: 1
+          items:
+            $ref: "#/components/schemas/ProductDto"
+    ProductDto:
+      type: object
+      properties:
+        id:
+          type: number
+          nullable: false
+        code:
+          type: string
+          nullable: false
+          minLength: 1
+        name:
+          type: string
+          nullable: false
+          minLength: 1
+
+
+
+
+
