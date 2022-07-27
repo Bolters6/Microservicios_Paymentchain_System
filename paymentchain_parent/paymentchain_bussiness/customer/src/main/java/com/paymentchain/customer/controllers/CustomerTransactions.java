@@ -41,6 +41,10 @@ public class CustomerTransactions {
             log.error("Customer no Existe");
             return ResponseEntity.notFound().build();
         }
+        if(!(transactionDto.getPaymentOperation().equals(PaymentOperation.DEPOSITAR) || transactionDto.getPaymentOperation().equals(PaymentOperation.RETIRAR))){
+            log.error("PaymentOperation errada");
+            return ResponseEntity.badRequest().build();
+        }
         try {
 
             ResponseEntity<Transaction> response = restTemplate.postForEntity("http://microservicio-transaction/transaction/depositandretire", transactionDto, Transaction.class);

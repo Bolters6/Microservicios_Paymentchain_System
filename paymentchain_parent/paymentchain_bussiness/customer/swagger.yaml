@@ -3,7 +3,7 @@ info:
   title: paymentchain-customer microservice
   version: 1.0.0
 servers:
-  - url: http://localhost:8080/api
+  - url: http://localhost:8080/api/customers
     description: common path
 paths:
   /customer/addcustomer:
@@ -76,6 +76,23 @@ paths:
       responses:
         200:
           description: Customer Borrado
+  /transaction/operationtp:
+    post:
+      summary: Transferir o Pagar
+      operationId: operationTP
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "../transaction/swagger.yaml#/components/schemas/TransactionTPDTO"
+      responses:
+        201:
+          description: Transaccion realizada correctamente
+          content:
+            application/json:
+              schema:
+                $ref: "../transaction/swagger.yaml#/components/schemas/TransactionTPDTO"
 components:
   schemas:
     CustomerDtoP:

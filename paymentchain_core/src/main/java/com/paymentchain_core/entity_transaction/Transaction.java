@@ -50,6 +50,8 @@ public class Transaction implements Serializable {
     @NotNull
     @Min(0)
     private Double accountAmount;
+    @NotBlank
+    private String destination;
 
     public static Double getFee(PaymentOperation paymentOperation) throws IllegalArgumentException{
         switch (paymentOperation){
@@ -61,6 +63,9 @@ public class Transaction implements Serializable {
             }
             case TRANSFERIR -> {
                 return 3.5;
+            }
+            case PAGAR -> {
+                return 1.5;
             }
             default -> {
                 throw new IllegalArgumentException("Hubo un Error con la Transaccion");
