@@ -86,7 +86,8 @@ public class CustomerTransactions {
                         .orElseThrow(() -> new IllegalArgumentException("Iban Erroneo"));
             }
             case RETIRAR -> {
-                return customerRepo.findByIban(iban)
+                return Optional.ofNullable(customerRepo.findByIban(iban)
+                                .orElseThrow(() -> new IllegalArgumentException("Iban Erroneo")))
                         .map(customer -> ResponseEntity
                                 .status(HttpStatus.CREATED)
                                 .body(customer.setAccountBalance(customer.getAccountBalance() - amount - 2.5)))
