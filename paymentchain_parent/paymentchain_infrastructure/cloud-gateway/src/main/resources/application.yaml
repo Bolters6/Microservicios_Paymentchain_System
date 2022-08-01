@@ -1,0 +1,29 @@
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: microservicio-customer
+          uri: lb://microservicio-customer
+          predicates:
+            - Path=/api/customer/**
+            - Header=Token, Pass
+          filters:
+            - StripPrefix=2
+            - AddResponseHeader=Greetings, Welcome Customer!
+        - id: microservicio-product
+          uri: lb://microservicio-product
+          predicates:
+            - Path=/api/product/**
+            - Header=Token, Pass
+          filters:
+            - StripPrefix=2
+            - AddResponseHeader=Greetings, Welcome to Products!
+        - id: microservicio-transaction
+          uri: lb://microservicio-transaction
+          predicates:
+            - Path=/api/transaction/**
+            - Header=Token, Pass
+          filters:
+            - StripPrefix=2
+            - AddResponseHeader=Greetings, Welcome to Transactions!
+
