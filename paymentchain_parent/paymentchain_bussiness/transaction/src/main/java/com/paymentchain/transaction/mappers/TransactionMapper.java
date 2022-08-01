@@ -13,6 +13,7 @@ public interface TransactionMapper {
 
     public TransactionMapper INSTANCE = Mappers.getMapper(TransactionMapper.class);
     @Mapping(target = "fee", expression = "java(Transaction.getFee(transactionDto.getPaymentOperation()))")
+    @Mapping(target = "destination", constant= "My_Account")
     public Transaction transactionDtoToModel(TransactionDto transactionDto);
     @Mapping(target = "fee", expression = "java(Transaction.getFee(convertEnum(transactionTPDTO)))")
     @Mapping(target = "amount", expression = "java(transactionTPDTO.getAmount().doubleValue())")

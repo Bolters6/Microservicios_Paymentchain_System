@@ -4,6 +4,7 @@ import com.paymentchain_core.enums.PaymentOperation;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.experimental.Accessors;
+import org.springframework.boot.context.properties.bind.DefaultValue;
 
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -25,4 +26,5 @@ public class TransactionDto {
     private Double amount;
     @NotBlank
     private String description;
+
 }

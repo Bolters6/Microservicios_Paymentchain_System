@@ -76,7 +76,9 @@ public class CustomerTransactions {
     @PostMapping(path = "/realize-operation", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> realizeOperation(@RequestParam(name = "iban") String iban,
                                               @RequestParam(name = "paymentoperation") PaymentOperation paymentOperation,
-                                              @RequestParam(name = "amount") Double amount) throws IllegalArgumentException {
+                                              @RequestParam(name = "amount") Double amount,
+                                              @RequestParam(name="destination", required = false, defaultValue = "My_Account") String destination)
+                                                throws IllegalArgumentException {
         switch (paymentOperation){
             case DEPOSITAR -> {
                 return customerRepo.findByIban(iban)
@@ -86,26 +88,46 @@ public class CustomerTransactions {
                         .orElseThrow(() -> new IllegalArgumentException("Iban Erroneo"));
             }
             case RETIRAR -> {
-                return Optional.ofNullable(customerRepo.findByIban(iban)
-                                .orElseThrow(() -> new IllegalArgumentException("Iban Erroneo")))
-                        .map(customer -> ResponseEntity
-                                .status(HttpStatus.CREATED)
-                                .body(customer.setAccountBalance(customer.getAccountBalance() - amount - 2.5)))
-                        .filter(customerResponseEntity -> {
-                            if(customerResponseEntity.getBody().getAccountBalance() > 0){
-                                return true;
-                            }
-                            customerResponseEntity.getBody()
-                                    .setAccountBalance(customerResponseEntity.getBody().getAccountBalance() + amount);
-                            return false;
-                        })
-                        .orElseThrow(() -> new IllegalArgumentException("Fondo insuficiente"));
+               return dropMoneyOfAccount(iban, amount, 2.5);
+            }
+            case TRANSFERIR -> {
+                Customer customer1 = (Customer) dropMoneyOfAccount(iban, amount, 3.5).getBody();
+                customerRepo.findByIban(destination)
+                        .map(customer -> customer.setAccountBalance(customer.getAccountBalance() + amount))
+                        .orElseThrow(() -> {
+                            Optional.ofNullable(customer1).ifPresentOrElse(c -> c.setAccountBalance(c.getAccountBalance() + amount),
+                                    () -> {
+                                log.error("customer1 nose que paso");
+                                throw new IllegalArgumentException("Customer1 No existente");});
+                            return new IllegalArgumentException("Iban Destinatario Erroneo");
+                        });
+                return ResponseEntity.status(HttpStatus.CREATED).body(customer1);
+            }
+            case PAGAR -> {
+                return dropMoneyOfAccount(iban, amount, 1.5);
             }
             default -> {
                 throw new IllegalArgumentException("Operacion no Soportada");
             }
         }
     }
+    private ResponseEntity<?> dropMoneyOfAccount(String iban, Double amount, Double fee){
+        return Optional.ofNullable(customerRepo.findByIban(iban)
+                        .orElseThrow(() -> new IllegalArgumentException("Iban Erroneo")))
+                .map(customer -> ResponseEntity
+                        .status(HttpStatus.CREATED)
+                        .body(customer.setAccountBalance(customer.getAccountBalance() - amount - fee)))
+                .filter(customerResponseEntity -> {
+                    if(customerResponseEntity.getBody().getAccountBalance() > 0){
+                        return true;
+                    }
+                    customerResponseEntity.getBody()
+                            .setAccountBalance(customerResponseEntity.getBody().getAccountBalance() + amount);
+                    return false;
+                })
+                .orElseThrow(() -> new IllegalArgumentException("Fondo insuficiente"));
+    }
+
     @Transactional(readOnly = true)
     @GetMapping(path = "/gettransactions/{iban}")
     public ResponseEntity<?> getTransactions(@PathVariable String iban){
